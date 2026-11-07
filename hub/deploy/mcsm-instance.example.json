@@ -1,0 +1,28 @@
+{
+  "nickname": "DSH Hub",
+  "startCommand": "node /app/server.mjs serve",
+  "stopCommand": "^c",
+  "type": "universal",
+  "processType": "docker",
+  "runAs": "1000:1000",
+  "eventTask": { "autoStart": true, "autoRestart": true, "autoRestartMaxTimes": 5, "ignore": false },
+  "docker": {
+    "image": "node:22-alpine",
+    "ports": ["127.0.0.1:8790:8790/tcp"],
+    "extraVolumes": ["/opt/dsh-hub|/app", "/var/lib/dsh-hub|/data"],
+    "capDrop": ["ALL"],
+    "memory": 256,
+    "networkMode": "bridge",
+    "workingDir": "/workspace",
+    "changeWorkdir": true,
+    "env": [
+      "DSH_HUB_DATA=/data",
+      "DSH_HUB_PUBLIC_ORIGIN=https://hub.example.com",
+      "DSH_HUB_TRUST_PROXY=1",
+      "HOST=0.0.0.0",
+      "PORT=8790",
+      "NODE_ENV=production"
+    ]
+  }
+}
+

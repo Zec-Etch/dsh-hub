@@ -1,0 +1,32 @@
+{
+  "name": "dsh-hub-agent",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Publishes this DeepSeek Harness's full Web GUI through a dsh-hub server over an outbound WebSocket tunnel.",
+  "type": "module",
+  "exports": {
+    ".": "./index.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "mux.js",
+    "tunnel.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zec-Etch/dsh-hub.git",
+    "directory": "plugin"
+  },
+  "homepage": "https://github.com/Zec-Etch/dsh-hub#readme"
+}

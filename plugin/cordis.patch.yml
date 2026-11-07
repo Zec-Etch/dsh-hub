@@ -1,0 +1,12 @@
+# A browser reached through the hub cannot see the backend's desktop, so the folder
+# chooser must be the in-app one on every client of this backend.
+- id: directory-picker
+  disabled: true
+- insert:
+    - id: dsh-hub-agent
+      name: dsh-hub-agent
+      config: {}
+    - id: hub-directory-picker
+      name: '@deepseek-ai/dsh-host-directory-picker-browse'
+    - id: hub-ui-directory-picker
+      name: '@deepseek-ai/dsh-client-ui-directory-picker-browse'

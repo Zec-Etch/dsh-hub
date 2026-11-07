@@ -1,0 +1,154 @@
+/* Phone and tablet layer over the unmodified DSH client. Selectors use the semantic part
+   of its CSS-module names and its data attributes, which survive DSH rebuilds. */
+html, body { overscroll-behavior: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+#hub-menu, #hub-scrim, #hub-keys { display: none; }
+
+#hub-switch {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 36px; padding: 0 10px; margin-bottom: 4px;
+  border: 0; border-radius: 10px; background: transparent; color: var(--dsw-alias-label-secondary); font: inherit; font-size: 14px; cursor: pointer;
+}
+#hub-switch:hover { background: var(--dsw-alias-interactive-bg-hover, rgb(127 127 127 / .12)); color: var(--dsw-alias-label-primary); }
+[data-sidebar-collapsed] #hub-switch { justify-content: center; padding: 0; }
+[data-sidebar-collapsed] #hub-switch span { display: none; }
+
+@media (pointer: coarse) {
+  html, body { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+  /* iOS zooms the page when a focused field renders below 16px. */
+  input, textarea, select, [contenteditable="true"], [contenteditable=""] { font-size: max(16px, 1em) !important; }
+}
+
+/* Sits directly above the on-screen keyboard while a terminal has focus. */
+[data-hub-terminal] #hub-keys {
+  display: flex; gap: 4px; position: fixed; z-index: 70; left: 0; right: 0; top: calc(var(--hub-vh, 100dvh) - 44px); height: 44px; padding: 4px 6px; box-sizing: border-box;
+  overflow-x: auto; scrollbar-width: none; background: var(--dsw-alias-bg-layer-1, #fff); border-top: .5px solid var(--dsw-alias-border-l2, #0000001a);
+}
+#hub-keys button {
+  flex: 1 0 auto; min-width: 42px; border: .5px solid var(--dsw-alias-border-l2, #0000001a); border-radius: 8px; background: var(--dsw-alias-bg-base, #fff); color: var(--dsw-alias-label-primary, #0f1115);
+  font: 13px/1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; touch-action: manipulation; user-select: none; -webkit-user-select: none;
+}
+[data-hub-terminal] .xterm { padding-bottom: 44px; box-sizing: border-box; }
+
+/* Hover-only affordances have no equivalent on touch, so they stay visible. */
+@media (hover: none) {
+  [class*="_sessionRow"] [class*="_rowActions"], [class*="_projectRow"] [class*="_rowActions"], [class*="_searchResultRow"] [class*="_rowActions"] { display: inline-flex !important; opacity: 1 !important; }
+  [class*="_sessionRow"] [class*="_time"], [class*="_sessionRow"] [class*="_pinIndicator"] { display: none; }
+  /* Archive and pin stay in the row's menu; a phone row only fits that one button. */
+  [class*="_sessionRow"] [class*="_rowActions"] > div { display: none !important; }
+  [class*="_row"] [class*="_rowActions"] { opacity: 1 !important; }
+  kbd, [class*="_shortcut"], [class*="_keys"], [class*="_hotkey"], [class*="_kbd"] { display: none !important; }
+}
+
+@media (pointer: coarse) {
+  [class*="_iconButton"], [class*="_searchButton"], [class*="_moreButton"], [class*="_sidebarCol"] [class*="_toggle"] { min-width: 36px; min-height: 36px; }
+  [class*="_sessionRow"], [class*="_projectRow"], [class*="_panelRow"] { min-height: 42px; }
+  [role="menuitem"], [role="option"], [role="menuitemradio"], [role="menuitemcheckbox"] { min-height: 42px; }
+  /* hub-header-start */
+  /* DSH caps these at exactly two 28px buttons, which clips the last one at touch size. */
+  [class*="_sectionHeader"] [class*="_headerActions"]:not([class*="_headerActionsHidden"]) { max-width: none; }
+  [class*="_sectionHeader"] [class*="_searchSlot"]:not([class*="_searchSlotExpanded"]) { max-width: 36px; }
+  /* hub-header-end */
+  [class*="_sessionRow"] [class*="_rowActions"] button { width: 36px !important; height: 36px !important; }
+}
+
+/* ---- Phones, foldables and landscape phones ---- */
+/* device-height is the screen, not the window: an on-screen keyboard must never flip a tablet
+   into the phone layout, which would turn its tiled sidebar into a drawer over the composer. */
+@media (max-width: 767px), (max-device-height: 500px) and (pointer: coarse) {
+  html, body { position: fixed; inset: 0; width: 100%; height: var(--hub-vh, 100dvh); overflow: hidden; }
+  #root { height: var(--hub-vh, 100dvh) !important; }
+
+  div:has(> [class*="_sidebarCol"]) {
+    grid-template-columns: minmax(0, 1fr) !important;
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: var(--hub-pad-bottom, env(safe-area-inset-bottom));
+    box-sizing: border-box;
+  }
+  [data-hub-keyboard] div:has(> [class*="_sidebarCol"]) { padding-bottom: 0; }
+  /* The drawer lives off-canvas so DSH keeps its state and every plugin entry inside it. */
+  div:has(> [class*="_sidebarCol"]) > [class*="_sidebarCol"] {
+    position: fixed; inset: 0 auto 0 0; z-index: 60; width: min(max(calc(100vw - 36px), 280px), 320px) !important; max-width: 100vw;
+    padding-top: env(safe-area-inset-top); padding-bottom: var(--hub-pad-bottom, env(safe-area-inset-bottom)); padding-left: env(safe-area-inset-left);
+    box-sizing: border-box; border-right: .5px solid var(--dsw-alias-border-l3);
+    transform: translateX(-102%); visibility: hidden;
+    transition: transform .22s cubic-bezier(.3, .7, .3, 1), visibility 0s .22s;
+  }
+  div:has(> [class*="_sidebarCol"]):not([data-sidebar-collapsed]) > [class*="_sidebarCol"] {
+    transform: none; visibility: visible; transition: transform .22s cubic-bezier(.3, .7, .3, 1);
+  }
+  div:has(> [class*="_sidebarCol"]) > [class*="_sidebarCol"] > * { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+  /* DSH freezes the sidebar root at its desktop width inline (for the collapse animation); the
+     drawer is wider or narrower than that, so the root must follow the drawer at any depth. */
+  div:has(> [class*="_sidebarCol"]) > [class*="_sidebarCol"] [class*="_root"][style*="width"] { width: 100% !important; min-width: 0 !important; max-width: 100% !important; }
+  div:has(> [class*="_sidebarCol"]) > [class*="_centerCol"] { grid-column: 1; grid-row: 1; width: 100%; }
+  div:has(> [class*="_sidebarCol"]) > [class*="_handle"] { display: none; }
+  /* DSH floats the collapsed sidebar's controls at the top-left, where a desktop has its window
+     buttons; on a phone that is the status bar, and the menu button below already does their job. */
+  div:has(> [class*="_sidebarCol"]) > [data-shell-leading] { display: none !important; }
+
+  #hub-menu {
+    display: grid; place-items: center; position: fixed; z-index: 15;
+    top: calc(env(safe-area-inset-top) + 7px); left: calc(env(safe-area-inset-left) + 6px);
+    width: 36px; height: 36px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--dsw-alias-label-secondary, currentColor);
+  }
+  [data-hub-drawer] #hub-menu, [data-hub-right] #hub-menu { display: none; }
+  #hub-scrim {
+    display: block; position: fixed; inset: 0; z-index: 55; background: rgb(0 0 0 / .42);
+    opacity: 0; pointer-events: none; transition: opacity .22s;
+  }
+  [data-hub-drawer] #hub-scrim { opacity: 1; pointer-events: auto; }
+
+  /* Leave room for the menu button beside the session title. */
+  header [class*="_titleRow"] { padding-left: 34px; box-sizing: border-box; min-width: 0; gap: 4px; }
+  header [class*="_titleCluster"], header [class*="_crumbs"], header [class*="_headerActions"] { min-width: 0; }
+  header [class*="_headerUtilities"] { flex-shrink: 0; }
+
+  /* Settings: one pane, with sections as a swipeable strip above the options. */
+  [role="dialog"]:has(> [class*="_nav"]):has(> [class*="_content"]) {
+    position: fixed !important; inset: 0 !important; width: 100% !important; max-width: none !important; height: var(--hub-vh, 100dvh) !important; max-height: none !important;
+    margin: 0 !important; border-radius: 0 !important; display: flex !important; flex-direction: column !important;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) 0 env(safe-area-inset-left); box-sizing: border-box;
+  }
+  [role="dialog"] > [class*="_nav"]:has(> [class*="_navList"]) {
+    flex: none !important; width: 100% !important; height: auto !important; max-width: none !important; order: 1; padding: 0 12px 6px !important; box-sizing: border-box;
+    border-right: 0 !important; border-bottom: .5px solid var(--dsw-alias-border-l2); overflow: hidden;
+  }
+  [role="dialog"] > [class*="_nav"] > [class*="_navTitle"] { display: none; }
+  [role="dialog"] > [class*="_nav"] > [class*="_navList"] {
+    flex-direction: row !important; gap: 4px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; margin: 0 !important; padding: 0 !important;
+  }
+  [role="dialog"] > [class*="_nav"] > [class*="_navList"]::-webkit-scrollbar { display: none; }
+  [role="dialog"] > [class*="_nav"] [class*="_navCell"] { flex: none !important; width: auto !important; white-space: nowrap; }
+  [role="dialog"]:has(> [class*="_nav"]) > [class*="_content"] { order: 2; flex: 1 1 auto !important; width: 100% !important; min-width: 0 !important; min-height: 0 !important; max-width: none !important; }
+  [role="dialog"]:has(> [class*="_nav"]) > [class*="_content"] > [class*="_options"] { padding-left: 16px !important; padding-right: 16px !important; padding-bottom: calc(16px + var(--hub-pad-bottom, env(safe-area-inset-bottom))) !important; box-sizing: border-box; }
+
+  /* The right panel covers the page; two columns never fit here. */
+  div:has(> [class*="_sidebarCol"]) > [class*="_rightbarCol"] { grid-column: 1; grid-row: 1; z-index: 25; }
+  div:has(> [class*="_sidebarCol"])[data-rightbar-collapsed] > [class*="_rightbarCol"] { pointer-events: none; }
+
+  /* Portaled surfaces position themselves for a desktop viewport; keep them on screen. */
+  [role="dialog"] { max-width: calc(100vw - 16px) !important; max-height: calc(var(--hub-vh, 100dvh) - 16px) !important; box-sizing: border-box; }
+  [role="menu"], [role="listbox"] { max-width: calc(100vw - 16px) !important; max-height: calc(var(--hub-vh, 100dvh) - 24px) !important; overflow-y: auto; overscroll-behavior: contain; }
+  [class*="_scroll"], [data-conversation-scroll] { -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain; }}
+
+/* Landscape phones: the fixed drawer rows would squeeze the session list to nothing. */
+@media (max-device-height: 500px) and (pointer: coarse) {
+  [class*="_sidebarCol"] > [class*="_root"] { overflow-y: auto; overscroll-behavior: contain; }
+  [class*="_sidebarCol"] [class*="_regionArea"] { flex: none !important; min-height: 280px; }
+}
+
+@media (max-width: 359px) {
+  /* Below this width only the session controls fit; background-task details stay in the drawer panels. */
+  header [class*="_headerActions"] { display: none; }
+}
+
+/* ---- Tablets: DSH's own columns stay, but the right panel may not crush the conversation ---- */
+@media (min-width: 768px) and (max-width: 1100px) and (pointer: coarse) {
+  html, body { overflow: hidden; height: var(--hub-vh, 100dvh); }
+  #root { height: var(--hub-vh, 100dvh) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  div:has(> [class*="_sidebarCol"]) > [class*="_sidebarCol"], #hub-scrim { transition: none !important; }
+}

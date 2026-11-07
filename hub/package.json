@@ -1,0 +1,27 @@
+{
+  "name": "dsh-hub-server",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Lightweight always-on hub: DSH backends dial in and browsers use each one's full Web GUI.",
+  "type": "module",
+  "bin": {
+    "dsh-hub": "./server.mjs"
+  },
+  "scripts": {
+    "start": "node server.mjs serve",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zec-Etch/dsh-hub.git",
+    "directory": "hub"
+  },
+  "homepage": "https://github.com/Zec-Etch/dsh-hub#readme"
+}

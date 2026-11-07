@@ -1,0 +1,9 @@
+.DS_Store
+node_modules/
+data/
+*.log
+.env
+.env.*
+dsh-hub.json
+dsh-hub-agent.json
+hub.json

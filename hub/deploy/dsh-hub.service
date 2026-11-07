@@ -1,0 +1,26 @@
+[Unit]
+Description=DSH Hub
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=dsh-hub
+WorkingDirectory=/opt/dsh-hub/hub
+Environment=DSH_HUB_DATA=/var/lib/dsh-hub
+Environment=DSH_HUB_PUBLIC_ORIGIN=https://hub.example.com
+Environment=DSH_HUB_TRUST_PROXY=1
+Environment=HOST=127.0.0.1
+Environment=PORT=8790
+ExecStart=/usr/bin/node server.mjs serve
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/var/lib/dsh-hub
+MemoryMax=256M
+
+[Install]
+WantedBy=multi-user.target

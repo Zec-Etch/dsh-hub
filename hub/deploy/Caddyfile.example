@@ -1,0 +1,4 @@
+# Caddy terminates TLS and proxies WebSockets without extra directives.
+hub.example.com {
+	reverse_proxy 127.0.0.1:8790
+}
