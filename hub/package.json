@@ -9,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.mjs serve",
-    "test": "node --test test/"
+    "test": "node --test test/hub.test.mjs"
   },
   "engines": {
     "node": ">=20"
@@ -25,3 +25,4 @@
   },
   "homepage": "https://github.com/Zec-Etch/dsh-hub#readme"
 }
+
