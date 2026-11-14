@@ -1,0 +1,48 @@
+{
+  "name": "dsh-hub-agent",
+  "version": "0.2.1",
+  "description": "Connect DeepSeek Harness to a self-hosted DSH Hub over an outbound WebSocket tunnel.",
+  "type": "module",
+  "main": "./plugin/index.js",
+  "exports": {
+    ".": "./plugin/index.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./plugin/locale/*.json",
+    "./icon": "./plugin/icon.svg"
+  },
+  "icon": "./plugin/icon.svg",
+  "files": [
+    "plugin/index.js",
+    "plugin/mux.js",
+    "plugin/tunnel.js",
+    "plugin/cordis.patch.yml",
+    "plugin/locale/*.json",
+    "plugin/icon.svg",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "README.zh-CN.md",
+    "SECURITY.md"
+  ],
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.2-rc.1 <0.3.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./plugin/cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test test/package.test.mjs",
+    "pack:check": "npm pack --dry-run --ignore-scripts"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zec-Etch/dsh-hub.git"
+  },
+  "bugs": "https://github.com/Zec-Etch/dsh-hub/issues",
+  "homepage": "https://github.com/Zec-Etch/dsh-hub#readme",
+  "keywords": ["dsh", "deepseek-harness", "dsh-plugin", "remote-access", "self-hosted"]
+}

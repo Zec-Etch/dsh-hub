@@ -1,0 +1,10 @@
+# Allow only the standalone server runtime into the build context.
+**
+!package.json
+!package-lock.json
+!server.mjs
+!mux.mjs
+!public/
+!public/**
+!Dockerfile
+!.dockerignore

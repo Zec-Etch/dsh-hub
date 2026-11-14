@@ -2,7 +2,18 @@ name: test
 on:
   push:
   pull_request:
+permissions:
+  contents: read
 jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --test test/package.test.mjs
+      - run: npm pack --dry-run --ignore-scripts
   hub:
     runs-on: ubuntu-latest
     strategy:
@@ -20,3 +31,56 @@ jobs:
           cache-dependency-path: hub/package-lock.json
       - run: npm ci
       - run: npm test
+  touch-browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hub/package-lock.json
+      - run: npm ci --prefix hub
+      - name: Run touch stylesheet checks in Chromium
+        shell: bash
+        run: |
+          google-chrome --headless=new --no-first-run --no-default-browser-check \
+            --disable-dev-shm-usage --remote-debugging-address=127.0.0.1 \
+            --remote-debugging-port=9333 --user-data-dir="$RUNNER_TEMP/dsh-hub-chrome" \
+            about:blank > "$RUNNER_TEMP/dsh-hub-chrome.log" 2>&1 &
+          browser_pid=$!
+          trap 'kill "$browser_pid" 2>/dev/null || true' EXIT
+          ready=0
+          for attempt in {1..50}; do
+            if curl --fail --silent http://127.0.0.1:9333/json/version >/dev/null; then ready=1; break; fi
+            sleep 0.2
+          done
+          if [ "$ready" != 1 ]; then cat "$RUNNER_TEMP/dsh-hub-chrome.log"; exit 1; fi
+          node hub/test-browser/touch-styles.mjs
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Compose and build server image
+        env:
+          DSH_HUB_PUBLIC_ORIGIN: https://hub.example.com
+        run: |
+          docker compose -f hub/deploy/compose.yaml config --quiet
+          docker build --tag dsh-hub:ci hub
+      - name: Initialize and smoke-test the non-root server
+        shell: bash
+        run: |
+          docker volume create dsh-hub-ci-data
+          trap 'docker rm -f dsh-hub-ci >/dev/null 2>&1 || true; docker volume rm dsh-hub-ci-data >/dev/null 2>&1 || true' EXIT
+          docker run --rm --env DSH_HUB_PASSWORD=ci-test-only-password \
+            --mount type=volume,source=dsh-hub-ci-data,target=/data dsh-hub:ci set-password
+          docker run --detach --name dsh-hub-ci --publish 127.0.0.1:8790:8790 \
+            --read-only --tmpfs /tmp:rw,noexec,nosuid,size=16m \
+            --cap-drop ALL --security-opt no-new-privileges:true \
+            --mount type=volume,source=dsh-hub-ci-data,target=/data dsh-hub:ci
+          for attempt in {1..50}; do
+            if curl --fail --silent http://127.0.0.1:8790/healthz; then exit 0; fi
+            sleep 0.2
+          done
+          docker logs dsh-hub-ci
+          exit 1

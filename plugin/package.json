@@ -1,7 +1,6 @@
 {
   "name": "dsh-hub-agent",
-  "version": "0.2.0",
-  "private": true,
+  "version": "0.2.1",
   "description": "Publishes this DeepSeek Harness's full Web GUI through a dsh-hub server over an outbound WebSocket tunnel.",
   "type": "module",
   "exports": {
@@ -17,6 +16,11 @@
     "locale/*.json",
     "icon.svg"
   ],
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.2-rc.1 <0.3.0"
+  },
+  "icon": "./icon.svg",
   "dsh": {
     "bundle": {
       "patch": "./cordis.patch.yml"

@@ -7,3 +7,6 @@ data/
 dsh-hub.json
 dsh-hub-agent.json
 hub.json
+dist/
+*.tgz
+__pycache__/

@@ -1,6 +1,6 @@
 {
   "name": "dsh-hub-server",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Lightweight always-on hub: DSH backends dial in and browsers use each one's full Web GUI.",
   "type": "module",

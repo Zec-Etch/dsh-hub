@@ -14,7 +14,7 @@ const MAX_RETRY_MS = 60_000;
 const SETTINGS_POLL_MS = 5_000;
 const STATUS_MS = 15_000;
 const PROTOCOL = 2;
-const VERSION = '0.2.0';
+const VERSION = '0.2.1';
 
 const settingsPath = () => join(process.env.DSH_HOME ?? join(homedir(), '.dsh'), 'dsh-hub-agent.json');
 

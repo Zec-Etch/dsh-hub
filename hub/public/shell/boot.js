@@ -154,10 +154,16 @@
         if (source.ownerNode === sheet) continue;
         try { for (const rule of source.cssRules) copy(rule, out); } catch { /* Cross-origin sheets cannot be read. */ }
       }
-      sheet.textContent = [...new Set(out)].join('\n');
+      const css = [...new Set(out)].join('\n');
+      if (sheet.textContent !== css) sheet.textContent = css;
     };
     let timer;
-    new MutationObserver(() => { clearTimeout(timer); timer = setTimeout(rebuild, 400); }).observe(document.head, { childList: true, subtree: true });
+    new MutationObserver((records) => {
+      // Replacing our own rules must not schedule another stylesheet scan.
+      if (records.every((record) => record.target === sheet || sheet.contains(record.target))) return;
+      clearTimeout(timer);
+      timer = setTimeout(rebuild, 400);
+    }).observe(document.head, { childList: true, subtree: true });
     rebuild();
   }
 

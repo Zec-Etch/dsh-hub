@@ -1,0 +1,33 @@
+services:
+  hub:
+    image: dsh-hub-server:0.2.1
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    init: true
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8790:8790"
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: "8790"
+      DSH_HUB_DATA: /data
+      DSH_HUB_PUBLIC_ORIGIN: "${DSH_HUB_PUBLIC_ORIGIN:?Set DSH_HUB_PUBLIC_ORIGIN to your HTTPS origin, e.g. https://hub.example.com}"
+      DSH_HUB_TRUST_PROXY: "1"
+    volumes:
+      - hub-data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    stop_grace_period: 30s
+
+volumes:
+  hub-data:
+    # Stable across release-directory and Compose-project changes.
+    # Use a different name for each independent Hub installation.
+    name: dsh-hub-data
