@@ -45,7 +45,9 @@ jobs:
         shell: bash
         run: |
           google-chrome --headless=new --no-first-run --no-default-browser-check \
-            --disable-dev-shm-usage --remote-debugging-address=127.0.0.1 \
+            --disable-dev-shm-usage \
+            --blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4 \
+            --remote-debugging-address=127.0.0.1 \
             --remote-debugging-port=9333 --user-data-dir="$RUNNER_TEMP/dsh-hub-chrome" \
             about:blank > "$RUNNER_TEMP/dsh-hub-chrome.log" 2>&1 &
           browser_pid=$!

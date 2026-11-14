@@ -2,6 +2,7 @@
 // node test-browser/touch-styles.mjs [boot.js] [--expect-cycle]
 // Requires the existing `ws` dependency and Chromium with remote debugging on port 9333.
 // CDP_URL may point at another browser; only contexts created by this script are closed.
+// Headless Linux needs a desktop pointer at launch; see the CI blink-settings flags.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
